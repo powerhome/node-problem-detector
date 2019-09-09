@@ -77,6 +77,8 @@ type Event struct {
 	Reason string `json:"reason"`
 	// Message is a human readable message of why the event is generated.
 	Message string `json:"message"`
+	// Value parsed form the message matched by the ValuePattern
+	Value string `json:"value"`
 }
 
 // Status is the status other problem daemons should report to node problem detector.

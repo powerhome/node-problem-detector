@@ -19,6 +19,7 @@ package systemlogmonitor
 import (
 	"encoding/json"
 	"io/ioutil"
+	"regexp"
 	"time"
 
 	"github.com/golang/glog"
@@ -77,6 +78,8 @@ func NewLogMonitorOrDie(configPath string) types.Monitor {
 		glog.Fatalf("Failed to validate %s matching rules %+v: %v", l.configPath, l.config.Rules, err)
 	}
 	glog.Infof("Finish parsing log monitor config file %s: %+v", l.configPath, l.config)
+
+	// TODO check value parse regex like above
 
 	l.watcher = logwatchers.GetLogWatcherOrDie(l.config.WatcherConfig)
 	l.buffer = NewLogBuffer(l.config.BufferSize)
@@ -162,13 +165,27 @@ func (l *logMonitor) generateStatus(logs []*logtypes.Log, rule systemlogtypes.Ru
 	message := generateMessage(logs)
 	var events []types.Event
 	var changedConditions []*types.Condition
+	var parsedValue = ""
 	if rule.Type == types.Temp {
+		if rule.ValuePattern != "" {
+			r, err := regexp.Compile(rule.ValuePattern)
+			if err != nil {
+				glog.Infof("Error compiling regexp pattern: %+v", rule.ValuePattern)
+				parsedValue = "** Error in the regexp pattern **"
+			}
+			groups := r.FindStringSubmatch(message)
+			if len(groups) > 1 {
+				parsedValue = groups[1]
+			}
+		}
+
 		// For temporary error only generate event
 		events = append(events, types.Event{
 			Severity:  types.Warn,
 			Timestamp: timestamp,
 			Reason:    rule.Reason,
 			Message:   message,
+			Value:     parsedValue,
 		})
 	} else {
 		// For permanent error changes the condition

@@ -69,7 +69,7 @@ func NewExporterOrDie(npdo *options.NodeProblemDetectorOptions) types.Exporter {
 
 func (ke *k8sExporter) ExportProblems(status *types.Status) {
 	for _, event := range status.Events {
-		ke.client.Eventf(util.ConvertToAPIEventType(event.Severity), status.Source, event.Reason, event.Message)
+		ke.client.Eventf(util.ConvertToAPIEventType(event.Severity), status.Source, event.Reason, event.Message, event.Values)
 	}
 	for _, cdt := range status.Conditions {
 		ke.conditionManager.UpdateCondition(cdt)

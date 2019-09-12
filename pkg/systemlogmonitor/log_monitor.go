@@ -172,17 +172,19 @@ func (l *logMonitor) generateStatus(logs []*logtypes.Log, rule systemlogtypes.Ru
 	message := generateMessage(logs)
 	var events []types.Event
 	var changedConditions []*types.Condition
-	var parsedValue = ""
+	var parsedValues = map[string]string{}
 	if rule.Type == types.Temp {
-		if rule.ValuePattern != "" {
-			r, err := regexp.Compile(rule.ValuePattern)
-			if err != nil {
-				glog.Infof("Error compiling regexp pattern: %+v", rule.ValuePattern)
-				parsedValue = "** Error in the regexp pattern **"
-			}
-			groups := r.FindStringSubmatch(message)
-			if len(groups) > 1 {
-				parsedValue = groups[1]
+		if len(rule.ValuePatterns) > 0 {
+			for key, value := range rule.ValuePatterns {
+				r, err := regexp.Compile(value)
+				if err != nil {
+					glog.Infof("Error compiling regexp pattern: %+v", rule.ValuePatterns)
+					parsedValues[key] = "** Error in the regexp pattern **"
+				}
+				groups := r.FindStringSubmatch(message)
+				if len(groups) > 1 {
+					parsedValues[key] = groups[1]
+				}
 			}
 		}
 
@@ -192,7 +194,7 @@ func (l *logMonitor) generateStatus(logs []*logtypes.Log, rule systemlogtypes.Ru
 			Timestamp: timestamp,
 			Reason:    rule.Reason,
 			Message:   message,
-			Value:     parsedValue,
+			Values:    parsedValues,
 		})
 	} else {
 		// For permanent error changes the condition

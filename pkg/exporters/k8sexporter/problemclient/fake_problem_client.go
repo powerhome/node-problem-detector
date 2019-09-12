@@ -89,8 +89,8 @@ func (f *FakeProblemClient) GetConditions(types []v1.NodeConditionType) ([]*v1.N
 	return conditions, nil
 }
 
-// Eventf does nothing now.
-func (f *FakeProblemClient) Eventf(eventType string, source, reason, messageFmt string, args ...interface{}) {
+// AnnotatedEventf does nothing now.
+func (f *FakeProblemClient) AnnotatedEventf(annotations, eventType string, source, reason, messageFmt string, args ...interface{}) {
 }
 
 func (f *FakeProblemClient) GetNode() (*v1.Node, error) {

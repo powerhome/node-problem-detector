@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	"k8s.io/client-go/tools/record"
@@ -79,7 +79,7 @@ func TestEvent(t *testing.T) {
 	fakeRecorder := record.NewFakeRecorder(1)
 	client := newFakeProblemClient()
 	client.recorders[testSource] = fakeRecorder
-	client.Eventf(v1.EventTypeWarning, testSource, "test reason", "test message")
+	client.AnnotatedEventf(map[string]string{}, v1.EventTypeWarning, testSource, "test reason", "test message")
 	expected := fmt.Sprintf("%s %s %s", v1.EventTypeWarning, "test reason", "test message")
 	got := <-fakeRecorder.Events
 	if expected != got {

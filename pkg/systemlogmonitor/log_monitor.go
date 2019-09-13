@@ -79,8 +79,6 @@ func NewLogMonitorOrDie(configPath string) types.Monitor {
 	}
 	glog.Infof("Finish parsing log monitor config file %s: %+v", l.configPath, l.config)
 
-	// TODO check value parse regex like above
-
 	l.watcher = logwatchers.GetLogWatcherOrDie(l.config.WatcherConfig)
 	l.buffer = NewLogBuffer(l.config.BufferSize)
 	// A 1000 size channel should be big enough.

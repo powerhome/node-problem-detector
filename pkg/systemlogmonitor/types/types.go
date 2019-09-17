@@ -42,4 +42,7 @@ type Rule struct {
 	// Pattern is the regular expression to match the problem in log.
 	// Notice that the pattern must match to the end of the line.
 	Pattern string `json:"pattern"`
+	// ValuePatterns is the regular expression to match a substring of the log
+	// to be extract as an value.
+	ValuePatterns map[string]string `json:"valuePatterns"`
 }

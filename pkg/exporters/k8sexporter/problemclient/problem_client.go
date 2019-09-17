@@ -45,8 +45,8 @@ type Client interface {
 	GetConditions(conditionTypes []v1.NodeConditionType) ([]*v1.NodeCondition, error)
 	// SetConditions set or update conditions of current node.
 	SetConditions(conditions []v1.NodeCondition) error
-	// Eventf reports the event.
-	Eventf(eventType string, source, reason, messageFmt string, args ...interface{})
+	// AnnotatedEventf reports the event.
+	AnnotatedEventf(annotations map[string]string, eventType string, source, reason, messageFmt string, args ...interface{})
 	// GetNode returns the Node object of the node on which the
 	// node-problem-detector runs.
 	GetNode() (*v1.Node, error)
@@ -109,14 +109,14 @@ func (c *nodeProblemClient) SetConditions(newConditions []v1.NodeCondition) erro
 	return c.client.RESTClient().Patch(types.StrategicMergePatchType).Resource("nodes").Name(c.nodeName).SubResource("status").Body(patch).Do().Error()
 }
 
-func (c *nodeProblemClient) Eventf(eventType, source, reason, messageFmt string, args ...interface{}) {
+func (c *nodeProblemClient) AnnotatedEventf(annotations map[string]string, eventType, source, reason, messageFmt string, args ...interface{}) {
 	recorder, found := c.recorders[source]
 	if !found {
 		// TODO(random-liu): If needed use separate client and QPS limit for event.
 		recorder = getEventRecorder(c.client, c.nodeName, source)
 		c.recorders[source] = recorder
 	}
-	recorder.Eventf(c.nodeRef, eventType, reason, messageFmt, args...)
+	recorder.AnnotatedEventf(c.nodeRef, annotations, eventType, reason, messageFmt, args...)
 }
 
 func (c *nodeProblemClient) GetNode() (*v1.Node, error) {

@@ -19,6 +19,7 @@ package systemlogmonitor
 import (
 	"encoding/json"
 	"io/ioutil"
+	"regexp"
 	"time"
 
 	"github.com/golang/glog"
@@ -162,13 +163,29 @@ func (l *logMonitor) generateStatus(logs []*logtypes.Log, rule systemlogtypes.Ru
 	message := generateMessage(logs)
 	var events []types.Event
 	var changedConditions []*types.Condition
+	var parsedValues = map[string]string{}
 	if rule.Type == types.Temp {
+		if len(rule.ValuePatterns) > 0 {
+			for key, value := range rule.ValuePatterns {
+				r, err := regexp.Compile(value)
+				if err != nil {
+					glog.Infof("Error compiling regexp pattern: %+v", rule.ValuePatterns)
+					parsedValues[key] = "** Error in the regexp pattern **"
+				}
+				groups := r.FindStringSubmatch(message)
+				if len(groups) > 1 {
+					parsedValues[key] = groups[1]
+				}
+			}
+		}
+
 		// For temporary error only generate event
 		events = append(events, types.Event{
 			Severity:  types.Warn,
 			Timestamp: timestamp,
 			Reason:    rule.Reason,
 			Message:   message,
+			Values:    parsedValues,
 		})
 	} else {
 		// For permanent error changes the condition

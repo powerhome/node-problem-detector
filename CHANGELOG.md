@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.3.0] - 2019-09-13
+## [0.8.0] - 2019-09-13
 ### Added
 - Add support to parse values from the event message and add in the event annotation.
 
@@ -27,10 +27,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     This rule would add the values `v1: pointer` and `v2: NULL pointer` to the kube event annotation.
 
 ### Changed
-- Update a few packages version to be able to use AnnotatedEventf instead of Eventf.
-- Update k8s.io/api version to kubernetes-1.15.0
-- Update k8s.io/apimachinery version to kubernetes-1.15.0
-- Update k8s.io/client-go version to kubernetes-1.15.0
+- Bump a few packages version to be able to use AnnotatedEventf instead of Eventf.
+- Bump k8s.io/api version to kubernetes-1.15.0
+- Bump k8s.io/apimachinery version to kubernetes-1.15.0
+- Bump k8s.io/client-go version to kubernetes-1.15.0
 
 
 ## [Unreleased]
